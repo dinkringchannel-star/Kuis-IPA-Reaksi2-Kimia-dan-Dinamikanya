@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuis Pertumbuhan & Perkembangan - Kelas 9</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px 15px;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      color: #222;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 25px;
+      max-width: 750px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .container::-webkit-scrollbar-track {
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+
+    .container::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 4px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #3a2e7a;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin-bottom: 15px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .info-bar {
+      display: flex;
+      justify-content: space-between;
+      background: #eef0ff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-weight: 700;
+      font-size: 16px;
+      color: #2c2c54;
+      border: 2px solid #d0d5ff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .progress {
+      height: 10px;
+      background: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      width: 0%;
+      transition: width .4s;
+    }
+
+    .question {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 15px;
+      line-height: 1.5;
+      color: #2c2c54;
+      background: #b9f5b0;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .option {
+      padding: 14px 16px;
+      background: #5a15ef;
+      border: 2px solid #e0dcf5;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .2s;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .option:hover:not(:disabled) {
+      background: #d62a55;
+      transform: translateX(5px);
+    }
+
+    .option:disabled {
+      cursor: not-allowed;
+      opacity: 0.9;
+    }
+
+    .option.correct {
+      background: #b9f5b0;
+      border-color: #2e7d32;
+      color: #1b5e20;
+      font-weight: 500;
+    }
+
+    .option.wrong {
+      background: #ffb3b3;
+      border-color: #c62828;
+      color: #7f0000;
+      font-weight: 500;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 15px;
+      transition: .2s;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, .25);
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-small {
+      flex: 0 0 auto;
+      padding: 12px 16px;
+      font-size: 14px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-align: center;
+      display: none;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.benar {
+      background: #b9f5b0;
+      color: #1b5e20;
+      border: 2px solid #2e7d32;
+    }
+
+    .feedback.salah {
+      background: #ffb3b3;
+      color: #7f0000;
+      border: 2px solid #c62828;
+    }
+
+    .start-screen,
+    .end-screen {
+      text-align: center;
+      padding: 15px 10px;
+    }
+
+    .end-screen h2 {
+      color: #3a2e7a;
+      margin-bottom: 10px;
+      font-size: 26px;
+    }
+
+    .score-big {
+      font-size: 60px;
+      font-weight: 900;
+      color: #764ba2;
+      margin: 10px 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, .1);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .music-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #fff;
+      border: 2px solid #764ba2;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
+      z-index: 100;
+    }
+
+    p {
+      color: #333;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .info-box {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      color: #856404;
+      padding: 12px;
+      border-radius: 10px;
+      margin: 15px 0;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .info-box strong {
+      color: #856404;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 18px;
+        max-height: calc(100vh - 20px);
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .question {
+        font-size: 16px;
+        padding: 12px;
+      }
+
+      .option {
+        font-size: 15px;
+        padding: 12px 14px;
+      }
+
+      .info-bar {
+        font-size: 14px;
+        padding: 10px 14px;
+      }
+
+      .score-big {
+        font-size: 50px;
+      }
+
+      .music-toggle {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+        top: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <button class="music-toggle" id="musicBtn" title="Musik">🔇</button>
+
+  <div class="container" id="mainContainer">
+    <div id="startScreen" class="start-screen">
+      <h1>🌱 Kuis IPA Kelas 9</h1>
+      <p class="subtitle">Reaksi-Reaksi Kimia dan Dinamikanya</p>
+      <div class="info-box">
+        <strong>📱 Info Penting untuk HP Android:</strong><br>
+        • Pastikan <strong>volume media HP tidak silent/mute</strong><br>
+        • Tekan <strong>"Test Suara"</strong> untuk mengaktifkan audio<br>
+        • Izinkan suara jika browser meminta
+      </div>
+      <p style="margin:15px 0;">Jawab 50 pertanyaan. Skor skala <strong>10 - 100</strong>.</p>
+      <button id="testBtn" onclick="testSuara()"
+        style="margin-bottom:10px; background: linear-gradient(135deg, #11998e, #38ef7d);">🔊 Test Suara Dulu</button>
+      <button onclick="mulaiKuis()">🎯 Mulai Kuis</button>
+    </div>
+
+    <div id="quizScreen" class="hidden">
+      <h1>🌱 Reaksi-Reaksi Kimia dan Dinamikanya</h1>
+      <div class="info-bar">
+        <span>Soal: <span id="qNum">1</span>/50</span>
+        <span>Skor: <span id="score">2</span></span>
+      </div>
+      <div class="progress">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="question" id="questionText"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="controls">
+        <button class="btn-small" onclick="bacaSoal()">🔊 Baca Lagi</button>
+        <button id="nextBtn" onclick="nextSoal()" disabled>Lanjut ➡</button>
+      </div>
+    </div>
+
+    <div id="endScreen" class="end-screen hidden">
+      <h2>🎉 Kuis Selesai!</h2>
+      <p>Skor akhir kamu:</p>
+      <div class="score-big" id="finalScore">2</div>
+      <p id="pesanAkhir" style="margin-bottom:15px;"></p>
+      <button onclick="location.reload()">🔄 Ulangi Kuis</button>
+    </div>
+  </div>
+
+  <script>
+    // ====== 50 PERTANYAAN ======
+    const soal = [
+      {
+                q: "Perubahan berikut yang merupakan reaksi kimia adalah...",
+                o: ["Es mencair", "Gula larut dalam air", "Besi berkarat", "Kertas disobek"],
+                a: 2,
+                e: "Besi berkarat merupakan reaksi kimia karena terbentuk zat baru yaitu besi oksida (karat) yang sifatnya berbeda dari besi asal."
+            },
+            {
+                q: "Ciri-ciri reaksi kimia berikut yang benar adalah...",
+                o: ["Tidak terbentuk zat baru", "Terbentuk zat baru dengan sifat berbeda", "Hanya berubah wujud", "Massa zat berkurang"],
+                a: 1,
+                e: "Ciri utama reaksi kimia adalah terbentuknya zat baru yang memiliki sifat berbeda dari zat-zat pereaksinya."
+            },
+            {
+                q: "Zat-zat yang bereaksi dalam suatu reaksi kimia disebut...",
+                o: ["Produk", "Katalis", "Reaktan (pereaksi)", "Pelarut"],
+                a: 2,
+                e: "Reaktan atau pereaksi adalah zat-zat yang mengalami perubahan dalam reaksi kimia. Zat baru yang dihasilkan disebut produk (hasil reaksi)."
+            },
+            {
+                q: "Zat-zat hasil reaksi kimia disebut...",
+                o: ["Reaktan", "Produk", "Katalis", "Inhibitor"],
+                a: 1,
+                e: "Produk adalah zat-zat baru yang dihasilkan dari suatu reaksi kimia. Produk terletak di sebelah kanan tanda panah dalam persamaan reaksi."
+            },
+            {
+                q: "Persamaan reaksi yang setara memenuhi hukum...",
+                o: ["Hukum Archimedes", "Hukum Kekekalan Massa (Lavoisier)", "Hukum Newton", "Hukum Boyle"],
+                a: 1,
+                e: "Persamaan reaksi yang setara memenuhi Hukum Kekekalan Massa dari Lavoisier, yaitu massa zat sebelum dan sesudah reaksi adalah sama."
+            },
+            {
+                q: "Pada reaksi: 2H₂ + O₂ → 2H₂O, koefisien reaksi dari H₂O adalah...",
+                o: ["1", "2", "3", "4"],
+                a: 1,
+                e: "Koefisien reaksi adalah angka yang terletak di depan rumus kimia. Pada reaksi tersebut, koefisien H₂O adalah 2."
+            },
+            {
+                q: "Indeks (subskrip) pada rumus kimia H₂O menunjukkan...",
+                o: ["Jumlah molekul air", "Jumlah atom hidrogen dalam satu molekul air", "Koefisien reaksi", "Massa molekul relatif"],
+                a: 1,
+                e: "Indeks atau subskrip menunjukkan jumlah atom suatu unsur dalam satu molekul. H₂O berarti dalam satu molekul air terdapat 2 atom hidrogen."
+            },
+            {
+                q: "Reaksi di mana dua zat atau lebih bergabung membentuk satu zat baru disebut reaksi...",
+                o: ["Penguraian", "Penggantian tunggal", "Sintesis (penggabungan)", "Pembakaran"],
+                a: 2,
+                e: "Reaksi sintesis atau penggabungan adalah reaksi di mana dua zat atau lebih bergabung membentuk satu zat baru. Contoh: 2H₂ + O₂ → 2H₂O"
+            },
+            {
+                q: "Reaksi penguraian adalah reaksi di mana...",
+                o: ["Dua zat bergabung menjadi satu", "Satu zat terurai menjadi dua zat atau lebih", "Terjadi pertukaran ion", "Zat bereaksi dengan oksigen"],
+                a: 1,
+                e: "Reaksi penguraian (dekomposisi) adalah reaksi di mana satu zat terurai menjadi dua zat atau lebih. Contoh: 2H₂O → 2H₂ + O₂"
+            },
+            {
+                q: "Contoh reaksi penguraian adalah...",
+                o: ["Fe + S → FeS", "CaCO₃ → CaO + CO₂", "Zn + CuSO₄ → ZnSO₄ + Cu", "CH₄ + 2O₂ → CO₂ + 2H₂O"],
+                a: 1,
+                e: "CaCO₃ → CaO + CO₂ adalah reaksi penguraian karena satu zat (kalsium karbonat) terurai menjadi dua zat (kalsium oksida dan karbon dioksida)."
+            },
+            {
+                q: "Reaksi pembakaran adalah reaksi suatu zat dengan...",
+                o: ["Air", "Oksigen", "Asam", "Basa"],
+                a: 1,
+                e: "Reaksi pembakaran adalah reaksi suatu zat dengan oksigen yang menghasilkan energi (panas dan cahaya). Contoh: CH₄ + 2O₂ → CO₂ + 2H₂O"
+            },
+            {
+                q: "Manakah yang merupakan reaksi pembakaran?",
+                o: ["NaOH + HCl → NaCl + H₂O", "CH₄ + 2O₂ → CO₂ + 2H₂O", "2Na + 2H₂O → 2NaOH + H₂", "CaO + H₂O → Ca(OH)₂"],
+                a: 1,
+                e: "CH₄ + 2O₂ → CO₂ + 2H₂O adalah reaksi pembakaran karena metana (CH₄) bereaksi dengan oksigen (O₂)."
+            },
+            {
+                q: "Pada reaksi: Zn + CuSO₄ → ZnSO₄ + Cu, jenis reaksinya adalah...",
+                o: ["Sintesis", "Penguraian", "Penggantian tunggal", "Penggantian ganda"],
+                a: 2,
+                e: "Ini adalah reaksi penggantian tunggal, di mana Zn menggantikan Cu dalam senyawa CuSO₄ karena Zn lebih reaktif daripada Cu."
+            },
+            {
+                q: "Reaksi penggantian ganda terjadi apabila...",
+                o: ["Satu zat terurai", "Dua zat saling bertukar pasangan ion", "Zat bereaksi dengan oksigen", "Dua zat bergabung"],
+                a: 1,
+                e: "Reaksi penggantian ganda terjadi ketika dua senyawa saling bertukar pasangan ionnya. Contoh: AgNO₃ + NaCl → AgCl + NaNO₃"
+            },
+            {
+                q: "Hukum kekekalan massa menyatakan bahwa...",
+                o: ["Massa zat selalu berkurang setelah reaksi", "Massa zat sebelum dan sesudah reaksi adalah sama", "Massa zat selalu bertambah setelah reaksi", "Massa tidak berpengaruh pada reaksi"],
+                a: 1,
+                e: "Hukum Kekekalan Massa (Hukum Lavoisier) menyatakan bahwa massa zat-zat sebelum reaksi sama dengan massa zat-zat sesudah reaksi dalam sistem tertutup."
+            },
+            {
+                q: "Jika 12 gram karbon bereaksi dengan 32 gram oksigen, massa CO₂ yang dihasilkan adalah...",
+                o: ["20 gram", "32 gram", "44 gram", "56 gram"],
+                a: 2,
+                e: "Berdasarkan Hukum Kekekalan Massa: massa CO₂ = massa C + massa O₂ = 12 + 32 = 44 gram."
+            },
+            {
+                q: "Setarakan persamaan reaksi: _Al + _O₂ → _Al₂O₃. Koefisien yang benar adalah...",
+                o: ["2, 3, 2", "4, 3, 2", "1, 1, 1", "3, 2, 1"],
+                a: 1,
+                e: "4Al + 3O₂ → 2Al₂O₃. Jumlah atom Al: 4 = 2×2 = 4 ✓. Jumlah atom O: 3×2 = 6 = 2×3 = 6 ✓."
+            },
+            {
+                q: "Faktor yang TIDAK mempengaruhi laju reaksi adalah...",
+                o: ["Suhu", "Konsentrasi", "Warna zat", "Luas permukaan"],
+                a: 2,
+                e: "Warna zat tidak mempengaruhi laju reaksi. Faktor yang mempengaruhi laju reaksi: suhu, konsentrasi, luas permukaan, dan katalis."
+            },
+            {
+                q: "Semakin tinggi suhu suatu reaksi, maka laju reaksi akan...",
+                o: ["Semakin lambat", "Semakin cepat", "Tetap sama", "Berhenti"],
+                a: 1,
+                e: "Semakin tinggi suhu, partikel bergerak semakin cepat sehingga tumbukan antar partikel lebih sering dan lebih energetik, sehingga laju reaksi meningkat."
+            },
+            {
+                q: "Semakin besar konsentrasi pereaksi, laju reaksi akan...",
+                o: ["Semakin lambat", "Semakin cepat", "Tidak berubah", "Berhenti"],
+                a: 1,
+                e: "Semakin besar konsentrasi, semakin banyak partikel pereaksi per satuan volume, sehingga kemungkinan tumbukan lebih besar dan laju reaksi meningkat."
+            },
+            {
+                q: "Mengapa gula yang berbentuk serbuk lebih cepat larut daripada gula yang berbentuk bongkahan?",
+                o: ["Karena serbuk gula lebih ringan", "Karena luas permukaan serbuk gula lebih besar", "Karena serbuk gula lebih manis", "Karena serbuk gula lebih panas"],
+                a: 1,
+                e: "Serbuk gula memiliki luas permukaan yang lebih besar sehingga lebih banyak bagian yang bersentuhan dengan pelarut, sehingga reaksi (pelarutan) lebih cepat."
+            },
+            {
+                q: "Katalis adalah zat yang...",
+                o: ["Memperlambat reaksi dan ikut bereaksi", "Mempercepat reaksi dan tidak ikut bereaksi (tidak habis)", "Menghentikan reaksi", "Mengubah produk reaksi"],
+                a: 1,
+                e: "Katalis adalah zat yang mempercepat laju reaksi dengan menurunkan energi aktivasi, tetapi tidak ikut bereaksi (tidak habis) dan dapat digunakan kembali."
+            },
+            {
+                q: "Enzim dalam tubuh manusia berperan sebagai...",
+                o: ["Reaktan", "Produk", "Katalis biologis", "Inhibitor"],
+                a: 2,
+                e: "Enzim adalah katalis biologis (biokatalisator) yang mempercepat reaksi-reaksi kimia dalam tubuh makhluk hidup tanpa ikut terkonsumsi."
+            },
+            {
+                q: "Reaksi eksoterm adalah reaksi yang...",
+                o: ["Menyerap kalor/energi", "Melepaskan kalor/energi", "Tidak melibatkan energi", "Hanya terjadi di suhu tinggi"],
+                a: 1,
+                e: "Reaksi eksoterm adalah reaksi yang melepaskan energi (kalor) ke lingkungan, sehingga lingkungan terasa panas. Contoh: pembakaran."
+            },
+            {
+                q: "Reaksi endoterm adalah reaksi yang...",
+                o: ["Melepaskan kalor", "Menyerap kalor/energi dari lingkungan", "Tidak memerlukan energi", "Menghasilkan cahaya saja"],
+                a: 1,
+                e: "Reaksi endoterm adalah reaksi yang menyerap energi (kalor) dari lingkungan, sehingga lingkungan terasa dingin. Contoh: fotosintesis."
+            },
+            {
+                q: "Contoh reaksi eksoterm dalam kehidupan sehari-hari adalah...",
+                o: ["Fotosintesis", "Pembakaran kayu", "Es mencair", "Penguapan air"],
+                a: 1,
+                e: "Pembakaran kayu adalah reaksi eksoterm karena melepaskan energi berupa panas dan cahaya ke lingkungan."
+            },
+            {
+                q: "Fotosintesis merupakan contoh reaksi...",
+                o: ["Eksoterm", "Endoterm", "Pembakaran", "Netralisasi"],
+                a: 1,
+                e: "Fotosintesis adalah reaksi endoterm karena memerlukan energi cahaya matahari untuk mengubah CO₂ dan H₂O menjadi glukosa dan O₂."
+            },
+            {
+                q: "Tanda-tanda terjadinya reaksi kimia meliputi berikut ini, KECUALI...",
+                o: ["Terbentuk endapan", "Terjadi perubahan warna", "Terbentuk gas", "Zat hanya berubah wujud"],
+                a: 3,
+                e: "Perubahan wujud saja (misalnya es mencair) bukan tanda reaksi kimia karena tidak terbentuk zat baru. Itu adalah perubahan fisika."
+            },
+            {
+                q: "Terbentuknya endapan dalam reaksi kimia ditandai dengan...",
+                o: ["Munculnya gelembung gas", "Larutan menjadi keruh/ada padatan", "Suhu meningkat", "Warna larutan memudar"],
+                a: 1,
+                e: "Endapan adalah zat padat yang terbentuk dari reaksi dua larutan dan tidak larut, sehingga larutan menjadi keruh atau terlihat padatan."
+            },
+            {
+                q: "Gelembung gas yang muncul saat reaksi menandakan...",
+                o: ["Terbentuk endapan", "Terbentuk gas sebagai produk", "Reaksi tidak terjadi", "Suhu menurun"],
+                a: 1,
+                e: "Gelembung gas yang muncul menunjukkan bahwa salah satu produk reaksi berupa gas. Contoh: logam + asam menghasilkan gas H₂."
+            },
+            {
+                q: "Persamaan reaksi yang benar menggunakan simbol...",
+                o: ["Tanda sama dengan (=)", "Tanda panah (→)", "Tanda plus (+)", "Tanda hubung (-)"],
+                a: 1,
+                e: "Dalam persamaan reaksi, tanda panah (→) menunjukkan arah reaksi, dari reaktan (kiri) menuju produk (kanan)."
+            },
+            {
+                q: "Pada persamaan reaksi, tanda (aq) menunjukkan...",
+                o: ["Zat berwujud gas", "Zat berwujud padat", "Zat terlarut dalam air (aqueous)", "Zat berwujud cair"],
+                a: 2,
+                e: "Tanda (aq) singkatan dari aqueous, yang menunjukkan zat terlarut dalam air (larutan). (s) = solid/padat, (l) = liquid/cair, (g) = gas."
+            },
+            {
+                q: "Notasi (s), (l), (g), dan (aq) dalam persamaan reaksi menunjukkan...",
+                o: ["Koefisien reaksi", "Indeks atom", "Wujud zat", "Jenis reaksi"],
+                a: 2,
+                e: "Notasi tersebut menunjukkan wujud zat: (s) = solid/padat, (l) = liquid/cair, (g) = gas, (aq) = aqueous/larutan dalam air."
+            },
+            {
+                q: "Reaksi netralisasi adalah reaksi antara...",
+                o: ["Logam dan nonlogam", "Asam dan basa", "Dua garam", "Logam dan asam"],
+                a: 1,
+                e: "Reaksi netralisasi adalah reaksi antara asam dan basa menghasilkan garam dan air. Contoh: HCl + NaOH → NaCl + H₂O"
+            },
+            {
+                q: "Hasil dari reaksi netralisasi adalah...",
+                o: ["Asam dan basa baru", "Garam dan air", "Gas dan endapan", "Logam dan nonlogam"],
+                a: 1,
+                e: "Reaksi netralisasi: asam + basa → garam + air. Contoh: HCl + NaOH → NaCl + H₂O"
+            },
+            {
+                q: "Perkaratan besi merupakan contoh reaksi...",
+                o: ["Penguraian", "Oksidasi", "Reduksi", "Netralisasi"],
+                a: 1,
+                e: "Perkaratan besi adalah reaksi oksidasi, yaitu reaksi besi dengan oksigen dan air membentuk besi oksida (karat): 4Fe + 3O₂ + 6H₂O → 4Fe(OH)₃"
+            },
+            {
+                q: "Cara berikut yang dapat mencegah perkaratan besi, KECUALI...",
+                o: ["Pengecatan", "Pelapisan dengan minyak", "Menyimpan di tempat lembap", "Galvanisasi (pelapisan seng)"],
+                a: 2,
+                e: "Menyimpan di tempat lembap justru mempercepat perkaratan karena kelembapan menyediakan air yang diperlukan untuk reaksi oksidasi besi."
+            },
+            {
+                q: "Energi aktivasi adalah...",
+                o: ["Energi yang dihasilkan reaksi", "Energi minimum yang diperlukan untuk memulai reaksi", "Energi yang diserap produk", "Energi kinetik partikel"],
+                a: 1,
+                e: "Energi aktivasi adalah energi minimum yang harus dimiliki partikel pereaksi agar dapat terjadi tumbukan efektif yang menghasilkan reaksi."
+            },
+            {
+                q: "Katalis bekerja dengan cara...",
+                o: ["Menaikkan energi aktivasi", "Menurunkan energi aktivasi", "Menambah jumlah reaktan", "Mengurangi suhu reaksi"],
+                a: 1,
+                e: "Katalis mempercepat reaksi dengan menurunkan energi aktivasi, sehingga lebih banyak partikel yang memiliki energi cukup untuk bereaksi."
+            },
+            {
+                q: "Tumbukan antar partikel yang menghasilkan reaksi disebut tumbukan...",
+                o: ["Elastis", "Inelastis", "Efektif", "Sempurna"],
+                a: 2,
+                e: "Tumbukan efektif adalah tumbukan antar partikel yang memiliki orientasi yang tepat dan energi yang cukup (≥ energi aktivasi) sehingga menghasilkan reaksi."
+            },
+            {
+                q: "Menurut teori tumbukan, reaksi kimia terjadi karena...",
+                o: ["Partikel saling menjauh", "Partikel saling bertumbukan dengan energi cukup", "Partikel diam di tempat", "Partikel menguap"],
+                a: 1,
+                e: "Teori tumbukan menyatakan bahwa reaksi kimia terjadi ketika partikel-partikel pereaksi saling bertumbukan dengan energi yang cukup dan orientasi yang tepat."
+            },
+            {
+                q: "Dalam kehidupan sehari-hari, makanan disimpan di kulkas agar...",
+                o: ["Rasanya bertambah", "Reaksi pembusukan melambat karena suhu rendah", "Makanan menjadi beku selamanya", "Bakteri bertambah banyak"],
+                a: 1,
+                e: "Menyimpan makanan di kulkas (suhu rendah) memperlambat laju reaksi pembusukan karena partikel bergerak lebih lambat sehingga tumbukan lebih sedikit."
+            },
+            {
+                q: "Kayu yang dibelah kecil-kecil lebih cepat terbakar karena...",
+                o: ["Massanya berkurang", "Luas permukaannya bertambah", "Suhunya lebih tinggi", "Kayu menjadi lebih ringan"],
+                a: 1,
+                e: "Kayu yang dibelah kecil-kecil memiliki luas permukaan total yang lebih besar, sehingga lebih banyak bagian yang bersentuhan dengan oksigen dan reaksi pembakaran lebih cepat."
+            },
+            {
+                q: "Persamaan reaksi berikut yang sudah setara adalah...",
+                o: ["H₂ + O₂ → H₂O", "2H₂ + O₂ → 2H₂O", "H₂ + O₂ → 2H₂O", "2H₂ + 2O₂ → 2H₂O"],
+                a: 1,
+                e: "2H₂ + O₂ → 2H₂O sudah setara. Atom H: 2×2=4 di kiri, 2×2=4 di kanan ✓. Atom O: 2 di kiri, 2 di kanan ✓."
+            },
+            {
+                q: "Pada reaksi: Mg + 2HCl → MgCl₂ + H₂, yang berperan sebagai produk adalah...",
+                o: ["Mg dan HCl", "MgCl₂ dan H₂", "Mg dan H₂", "HCl dan MgCl₂"],
+                a: 1,
+                e: "Produk adalah zat di sebelah kanan tanda panah, yaitu MgCl₂ (magnesium klorida) dan H₂ (gas hidrogen)."
+            },
+            {
+                q: "Reaksi antara logam natrium dengan air menghasilkan...",
+                o: ["NaO dan H₂", "NaOH dan H₂", "Na₂O dan H₂O", "NaCl dan H₂"],
+                a: 1,
+                e: "2Na + 2H₂O → 2NaOH + H₂. Natrium bereaksi dengan air menghasilkan natrium hidroksida (NaOH) dan gas hidrogen (H₂)."
+            },
+            {
+                q: "Mengapa reaksi di laboratorium sering dilakukan dengan memanaskan pereaksi?",
+                o: ["Agar zat berubah warna", "Untuk menambah energi kinetik partikel sehingga reaksi lebih cepat", "Untuk mengurangi jumlah produk", "Untuk mengubah reaktan menjadi katalis"],
+                a: 1,
+                e: "Pemanasan menambah energi kinetik partikel sehingga partikel bergerak lebih cepat, tumbukan lebih sering dan lebih energetik, sehingga laju reaksi meningkat."
+            },
+            {
+                q: "Seorang siswa melarutkan tablet vitamin C dalam air panas dan air dingin. Tablet dalam air panas lebih cepat larut. Hal ini menunjukkan pengaruh... terhadap laju reaksi.",
+                o: ["Konsentrasi", "Katalis", "Suhu", "Luas permukaan"],
+                a: 2,
+                e: "Perbedaan kecepatan larut di air panas dan dingin menunjukkan pengaruh suhu. Suhu tinggi mempercepat laju reaksi karena energi kinetik partikel meningkat."
+            },
+            {
+                q: "Dalam reaksi: CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂, gas yang dihasilkan adalah...",
+                o: ["H₂", "O₂", "CO₂", "Cl₂"],
+                a: 2,
+                e: "Gas yang dihasilkan adalah CO₂ (karbon dioksida). Reaksi antara kalsium karbonat dengan asam klorida menghasilkan kalsium klorida, air, dan gas CO₂."
+            },
+            {
+                q: "Pernyataan yang benar tentang hubungan laju reaksi dengan ukuran partikel adalah...",
+                o: ["Semakin besar ukuran partikel, semakin cepat reaksi", "Semakin kecil ukuran partikel, semakin cepat reaksi", "Ukuran partikel tidak mempengaruhi laju reaksi", "Partikel harus berukuran sama"],
+                a: 1,
+                e: "Semakin kecil ukuran partikel, semakin besar luas permukaan total, sehingga semakin banyak bidang singgung yang bereaksi dan laju reaksi semakin cepat."
+            }
+    ];
+
+    // ====== AUDIO SYSTEM ======
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        catch (e) { console.warn('AudioContext error:', e); }
+      }
+      return audioCtx;
+    }
+
+    function unlockAudio() {
+      const ctx = initAudio();
+      if (!ctx) return;
+      if (ctx.state === 'suspended') ctx.resume();
+      try {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.frequency.value = 440;
+        g.gain.setValueAtTime(0.001, ctx.currentTime);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + 0.05);
+      } catch (e) { }
+    }
+
+    function playTone(freq, dur, type = 'sine', vol = 0.3) {
+      const ctx = initAudio();
+      if (!ctx) return;
+      if (ctx.state === 'suspended') ctx.resume();
+      try {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(vol, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + dur);
+      } catch (e) { }
+    }
+
+    function suaraKlik() { playTone(800, 0.1, 'square', 0.2); }
+    function suaraBenar() {
+      playTone(523, 0.15, 'sine', 0.3);
+      setTimeout(() => playTone(659, 0.15, 'sine', 0.3), 150);
+      setTimeout(() => playTone(784, 0.3, 'sine', 0.3), 300);
+    }
+    function suaraSalah() {
+      playTone(300, 0.2, 'sawtooth', 0.25);
+      setTimeout(() => playTone(200, 0.4, 'sawtooth', 0.25), 200);
+    }
+
+    // ====== MUSIK LATAR ======
+    let musikOn = false, musikInterval;
+    const nadaMusik = [261, 329, 392, 329, 261, 392, 329, 261, 349, 293, 261, 329];
+    let idxNada = 0;
+
+    function toggleMusik() {
+      unlockAudio();
+      musikOn = !musikOn;
+      document.getElementById('musicBtn').textContent = musikOn ? '🔊' : '🔇';
+      if (musikOn) {
+        musikInterval = setInterval(() => {
+          playTone(nadaMusik[idxNada % nadaMusik.length], 0.4, 'triangle', 0.08);
+          idxNada++;
+        }, 500);
+      } else {
+        clearInterval(musikInterval);
+      }
+    }
+    document.getElementById('musicBtn').onclick = toggleMusik;
+
+    // ====== TEXT TO SPEECH ======
+    let voiceID = null;
+
+    function pilihVoiceIndonesia() {
+      const voices = speechSynthesis.getVoices();
+      if (voices.length === 0) return null;
+      let voice = voices.find(v => v.lang === 'id-ID') ||
+        voices.find(v => v.lang.startsWith('id')) ||
+        voices.find(v => v.lang === 'ms-MY') ||
+        voices.find(v => v.lang.startsWith('ms'));
+      if (voice) voiceID = voice;
+      return voice;
+    }
+
+    if ('speechSynthesis' in window) {
+      pilihVoiceIndonesia();
+      speechSynthesis.onvoiceschanged = pilihVoiceIndonesia;
+    }
+
+    function bicara(teks) {
+      if (!('speechSynthesis' in window)) return;
+      speechSynthesis.cancel();
+      try {
+        const u = new SpeechSynthesisUtterance(teks);
+        if (voiceID) u.voice = voiceID;
+        u.lang = 'id-ID';
+        u.rate = 0.95;
+        u.pitch = 1;
+        u.volume = 1;
+        speechSynthesis.speak(u);
+      } catch (e) { console.warn('Bicara error:', e); }
+    }
+
+    function hentikanSuara() {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+      }
+    }
+
+    function testSuara() {
+      unlockAudio();
+      setTimeout(() => {
+        playTone(440, 0.3, 'sine', 0.3);
+        setTimeout(() => playTone(660, 0.3, 'sine', 0.3), 350);
+      }, 100);
+      setTimeout(() => bicara("Test suara berhasil. Selamat belajar!"), 200);
+      alert("🔊 Jika kamu mendengar suara beep dan bicara, berarti audio berfungsi!");
+    }
+
+    // ====== GAME LOGIC ======
+    let idx = 0, skor = 0, sudahDijawab = false;
+    let timeoutBacaSoal = null; // 🔑 Variabel untuk menyimpan ID timeout
+
+    function mulaiKuis() {
+      unlockAudio();
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(" ");
+        speechSynthesis.speak(u);
+      }
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('quizScreen').classList.remove('hidden');
+      tampilkanSoal();
+      if (!musikOn) toggleMusik();
+    }
+
+    function tampilkanSoal() {
+      sudahDijawab = false;
+
+      // 🔑 Batalkan timeout pembacaan soal sebelumnya (jika ada)
+      if (timeoutBacaSoal) {
+        clearTimeout(timeoutBacaSoal);
+        timeoutBacaSoal = null;
+      }
+      hentikanSuara(); // Stop semua suara yang sedang berjalan
+
+      const s = soal[idx];
+      document.getElementById('qNum').textContent = idx + 1;
+      document.getElementById('score').textContent = skor;
+      document.getElementById('progressFill').style.width = ((idx) / 50 * 100) + '%';
+      document.getElementById('questionText').textContent = (idx + 1) + ". " + s.q;
+      document.getElementById('feedback').className = 'feedback';
+      document.getElementById('nextBtn').disabled = true;
+
+      const optDiv = document.getElementById('options');
+      optDiv.innerHTML = '';
+      const huruf = ['A', 'B', 'C', 'D'];
+      s.o.forEach((opsi, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.textContent = huruf[i] + ". " + opsi;
+        btn.addEventListener('click', () => pilihJawaban(i, btn));
+        optDiv.appendChild(btn);
+      });
+
+      document.getElementById('mainContainer').scrollTo({ top: 0, behavior: 'smooth' });
+
+      // 🔑 Simpan ID timeout agar bisa dibatalkan nanti
+      timeoutBacaSoal = setTimeout(() => {
+        if (!sudahDijawab) { // 🔑 Hanya baca jika belum dijawab
+          bicara(s.q + ". Pilihan: " + s.o.join(", "));
+        }
+        timeoutBacaSoal = null;
+      }, 500);
+    }
+
+    function bacaSoal() {
+      unlockAudio();
+      // 🔑 Batalkan timeout yang sedang berjalan
+      if (timeoutBacaSoal) {
+        clearTimeout(timeoutBacaSoal);
+        timeoutBacaSoal = null;
+      }
+      const s = soal[idx];
+      bicara(s.q + ". Pilihan: " + s.o.join(", "));
+    }
+
+    function pilihJawaban(pilihan, btn) {
+      if (sudahDijawab) return;
+      sudahDijawab = true;
+
+      unlockAudio();
+
+      // 🔑 KUNCI PERBAIKAN: Batalkan timeout pembacaan soal
+      if (timeoutBacaSoal) {
+        clearTimeout(timeoutBacaSoal);
+        timeoutBacaSoal = null;
+      }
+
+      // 🔑 Hentikan suara apapun yang sedang diputar
+      hentikanSuara();
+
+      // Baru mainkan suara klik
+      setTimeout(suaraKlik, 50);
+
+      const s = soal[idx];
+      const buttons = document.querySelectorAll('.option');
+      buttons.forEach(b => b.disabled = true);
+
+      const fb = document.getElementById('feedback');
+      if (pilihan === s.a) {
+        btn.classList.add('correct');
+        skor += 2;
+        setTimeout(suaraBenar, 200);
+        fb.textContent = '✅ Benar! +2 poin';
+        fb.className = 'feedback show benar';
+        // 🔑 Beri jeda agar suara efek selesai dulu baru bicara
+        setTimeout(() => {
+          if (sudahDijawab) bicara("Benar!");
+        }, 700);
+      } else {
+        btn.classList.add('wrong');
+        buttons[s.a].classList.add('correct');
+        setTimeout(suaraSalah, 200);
+        fb.textContent = '❌ Salah. Jawaban benar: ' + ['A', 'B', 'C', 'D'][s.a] + ". " + s.o[s.a];
+        fb.className = 'feedback show salah';
+        setTimeout(() => {
+          if (sudahDijawab) bicara("Salah. Jawaban yang benar adalah " + s.o[s.a]);
+        }, 700);
+      }
+
+      document.getElementById('score').textContent = skor;
+      document.getElementById('nextBtn').disabled = false;
+
+      setTimeout(() => {
+        fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    function nextSoal() {
+      unlockAudio();
+      // 🔑 Hentikan suara feedback sebelum lanjut
+      hentikanSuara();
+      suaraKlik();
+      idx++;
+      if (idx >= soal.length) {
+        selesai();
+      } else {
+        tampilkanSoal();
+      }
+    }
+
+    function selesai() {
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('endScreen').classList.remove('hidden');
+      document.getElementById('finalScore').textContent = skor;
+      document.getElementById('mainContainer').scrollTo({ top: 0, behavior: 'smooth' });
+
+      let pesan = "";
+      if (skor >= 90) pesan = "Kamu Mendapatkan 🏆, Luar biasa! Kamu sangat menguasai materi!";
+      else if (skor >= 70) pesan = "Kamu dapat 👍, Bagus! Terus belajar ya!";
+      else if (skor >= 40) pesan = "Hasilnya Lumayan, semangat ya, masih perlu belajar lagi.";
+      else pesan = "📚 Jangan menyerah, ayo baca ulang materinya!";
+
+      document.getElementById('pesanAkhir').textContent = pesan;
+
+      if (skor >= 70) setTimeout(suaraBenar, 300);
+      setTimeout(() => bicara("Kuis selesai. Skor kamu " + skor + " dari 100. " + pesan), 800);
+    }
+  </script>
+</body>
+
+</html>
